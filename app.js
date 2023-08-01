@@ -18,9 +18,9 @@ app.listen(process.env.PORT, () => {
 
 app.post("/create-checkout-session", async (req, res) => {
   try {
-    // to get the current web address(URL)
-    const currentURL = req.protocol + "://" + req.get("host") + req.originalUrl;
-    console.log(currentURL);
+    // Get the base URL without the path
+    const baseURL = req.protocol + "://" + req.get("host") + req.baseUrl;
+
     //takes input for stripe and gives a session as ouput
     const session = await stripe.checkout.sessions.create({
       //payment_method_types: ["card", "google_pay", "upi", "paytm"],
@@ -41,8 +41,8 @@ app.post("/create-checkout-session", async (req, res) => {
           quantity: 1, // you may want to adjust the quantity as needed
         },
       ],
-      success_url: `${currentURL}/success`, // Using the current web address dynamically
-      cancel_url: `${currentURL}/cancel`, // Using the current web address dynamically
+      success_url: `${baseURL}/success`, // Using the current web address dynamically
+      cancel_url: `${baseURL}/cancel`, // Using the current web address dynamically
     });
     res.json({ url: session.url });
   } catch (e) {
