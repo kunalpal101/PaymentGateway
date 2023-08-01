@@ -1,3 +1,5 @@
+const back_uri = window.location.href.replace(/\/$/, "");
+
 var button = document.getElementById("checkoutButton");
 button.addEventListener("click", function (event) {
   event.preventDefault();
@@ -28,7 +30,7 @@ async function checkoutPay() {
         input_fields.amount
     );
 
-    await fetch("/create-checkout-session", {
+    await fetch(back_uri + "/create-checkout-session", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
