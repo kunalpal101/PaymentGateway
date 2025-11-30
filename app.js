@@ -8,12 +8,17 @@ var bodyParser = require("body-parser");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
+// Use the secret key from env for the Stripe SDK (server-side only)
+if (!process.env.STRIPE_SECRET_KEY) {
+  console.warn("Warning: STRIPE_SECRET_KEY is not set. Add it to your .env or environment before using Stripe.");
+}
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 // const storeItems = new Map();
 
-app.listen(process.env.PORT, () => {
-  console.log("Listening on port " + process.env.PORT);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log("Listening on port " + PORT);
 });
 
 app.post("/create-checkout-session", async (req, res) => {
@@ -61,6 +66,11 @@ app.get("/success", function (req, res) {
 
 app.get("/cancel", function (req, res) {
   res.sendFile(__dirname + "/FrontEnd/failed.html");
+});
+
+// Provide the publishable key for the frontend (safe to expose)
+app.get("/config", (req, res) => {
+  res.json({ publishableKey: process.env.STRIPE_PUBLISHABLE_KEY || "" });
 });
 
 //for card number, put "4242424242"

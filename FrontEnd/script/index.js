@@ -1,4 +1,16 @@
 const back_uri = window.location.href.replace(/\/$/, "");
+// Optional: fetch publishable key (safe to expose) to initialize Stripe.js on the frontend
+let stripePublishableKey = "";
+fetch(back_uri + "/config")
+  .then((res) => res.json())
+  .then((json) => {
+    stripePublishableKey = json.publishableKey;
+    // If you need to initialize Stripe.js (client-side) you can do it here:
+    // const stripe = Stripe(stripePublishableKey);
+  })
+  .catch((err) => {
+    console.log("No publishable key available", err);
+  });
 
 var button = document.getElementById("checkoutButton");
 button.addEventListener("click", function (event) {
@@ -34,6 +46,7 @@ async function checkoutPay() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        // Don't send your secret key from the browser. The backend handles the secret.
       },
       body: JSON.stringify({
         name: input_fields.name,
